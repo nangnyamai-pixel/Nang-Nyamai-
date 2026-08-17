@@ -16,38 +16,25 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const requestedNext = searchParams.get("next") ?? "/";
-  const next = requestedNext.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/";
+  const next = searchParams.get("next") ?? "/";
 
   if (code) {
     const supabase = await createClient();
     const { error, data } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data.user) {
-      // Provision a profile only when one does not exist. Existing roles are
-      // never overwritten by an OAuth callback.
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      if (!existingProfile) {
-        const configuredAdmins = (process.env.ADMIN_EMAILS ?? "")
-          .split(",")
-          .map((email) => email.trim().toLowerCase())
-          .filter(Boolean);
-        const email = data.user.email?.toLowerCase() ?? null;
-        const role = email && configuredAdmins.includes(email) ? "admin" : "customer";
-
-        await supabase.from("profiles").insert({
+      // Ensure a profile row exists for this user with role = customer.
+      // Uses upsert so repeat sign-ins don't fail or duplicate rows.
+      await supabase.from("profiles").upsert(
+        {
           id: data.user.id,
           email: data.user.email ?? null,
           full_name: data.user.user_metadata?.full_name ?? null,
           avatar_url: data.user.user_metadata?.avatar_url ?? null,
-          role,
-        });
-      }
+          role: "customer",
+        },
+        { onConflict: "id", ignoreDuplicates: true }
+      );
 
       return NextResponse.redirect(`${origin}${next}`);
     }

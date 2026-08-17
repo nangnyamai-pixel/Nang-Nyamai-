@@ -16,7 +16,7 @@ export async function updateSession(request: NextRequest) {
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -48,16 +48,6 @@ export async function updateSession(request: NextRequest) {
     redirectUrl.pathname = "/auth/login";
     redirectUrl.searchParams.set("redirectTo", path);
     return NextResponse.redirect(redirectUrl);
-  }
-
-  if (user && (isStaffRoute || isAdminRoute)) {
-    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-    const allowed = isAdminRoute ? profile?.role === "admin" : profile?.role === "staff" || profile?.role === "admin";
-    if (!allowed) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = "/";
-      return NextResponse.redirect(redirectUrl);
-    }
   }
 
   // Role-based checks (staff vs admin) happen in lib/auth using the

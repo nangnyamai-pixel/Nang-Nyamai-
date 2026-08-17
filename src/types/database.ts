@@ -103,15 +103,7 @@ export interface Database {
           display_order?: number;
           is_active?: boolean;
         };
-        Relationships: [
-          {
-            foreignKeyName: "menu_items_category_id_fkey";
-            columns: ["id"];
-            isOneToOne: false;
-            referencedRelation: "menu_items";
-            referencedColumns: ["category_id"];
-          }
-        ];
+        Relationships: [];
       };
       menu_items: {
         Row: {
