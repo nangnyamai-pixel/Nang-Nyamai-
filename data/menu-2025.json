@@ -1,0 +1,158 @@
+{
+  "restaurant": {
+    "name": "Budaya Restaurant",
+    "operator": "Sarawak Cultural Village Sdn Bhd",
+    "location": "Pantai Damai, Santubong, Jalan Sultan Tengah, 93010 Kuching, Sarawak, Malaysia",
+    "source": "https://scv4you.github.io/scv-budaya-restaurant-menu/budayarestaurantmenu2025.pdf",
+    "menu_year": 2025,
+    "currency": "MYR",
+    "currency_symbol": "RM",
+    "sst_rate": 0.06,
+    "price_note": "All prices in the source menu are subject to 6% SST.",
+    "data_note": "Names and descriptions are transcribed from the source PDF; minor spelling errors were normalized where practical."
+  },
+  "categories": [
+    {
+      "slug": "sarawak-ethnic-kitchen-sets",
+      "name": "Sarawak Ethnic Kitchen Sets",
+      "items": [
+        {
+          "name": "Set A",
+          "price": 55.0,
+          "description": "Nasi Putih; Manok Pansoh; Ikan Asam Pedas; Daging Tepus; Sayur Paku Masak Belacan; Daun Ubi Tutuk; Labu Masak Lemak; Umai Sarawak; buah tempatan; Air Selasih."
+        },
+        {
+          "name": "Set B",
+          "price": 45.0,
+          "description": "Nasi Putih; Manok Pansoh; Ikan Asam Pedas; Labu Masak Lemak; Umai Sarawak; buah tempatan; Air Selasih."
+        }
+      ]
+    },
+    {
+      "slug": "sarawak-ethnic-kitchen-a-la-carte",
+      "name": "Sarawak Ethnic Kitchen Ala Carte",
+      "items": [
+        { "name": "Manok Pansoh", "price": 15.0, "description": "Chicken cooked in bamboo with fresh herbs and spices." },
+        { "name": "Ikan Asam Pedas", "price": 15.0, "description": "Hot and sour fish cooked with golden brinjal." },
+        { "name": "Daging Tepus", "price": 15.0, "description": "Beef cooked with wild ginger root." },
+        { "name": "Daging Kasam Ubi", "price": 15.0, "description": "Bidayuh beef blade pickles marinated with salt." },
+        { "name": "Udang Tempoyak", "price": 15.0, "description": "Fried prawn cooked with durian paste." },
+        { "name": "Umai Sarawak", "price": 12.0, "description": "Thinly sliced raw fish marinated with onion, ginger, shallot, chillies and lime." },
+        { "name": "Sayur Paku Masak Belacan", "price": 8.0, "description": "Wild fern cooked with shrimp paste and sliced chillies." },
+        { "name": "Labu Masak Lemak", "price": 8.0, "description": "Pumpkin cooked with coconut milk." },
+        { "name": "Daun Ubi Tutuk", "price": 8.0, "description": "Squashed tapioca leaves." },
+        { "name": "Steam White Rice", "price": 2.5 },
+        { "name": "Air Selasih", "price": 3.5, "description": "Cordial drink." }
+      ]
+    },
+    {
+      "slug": "sarawak-highlander-sets",
+      "name": "Sarawak Highlander Ethnic Cuisine Sets",
+      "items": [
+        {
+          "name": "Set A",
+          "price": 60.0,
+          "description": "Soup of Young Cucumber Leaves; Bario Rice with Wild Mushroom; Bued Main Salad; Abbeng Arur Layun; Labo Belatuh Pa’ Lungan; Bua’ Petar Pa’ Mada; Arur Dalan Mixed Vegetable; Kari Bua’ Kabar; Puluh; Pa’Lungan Dessert; Cucumber Juice; buah tempatan."
+        },
+        {
+          "name": "Set B",
+          "price": 50.0,
+          "description": "Bario Rice with Wild Mushroom; Bued Main Salad; Abbeng Arur Layun; Labo Belatuh Pa’ Lungan; Bua’ Petar Pa’ Mada; Arur Dalan Mixed Vegetable; Cucumber Juice; buah tempatan."
+        }
+      ]
+    },
+    {
+      "slug": "sarawak-highlander-a-la-carte",
+      "name": "Sarawak Highlander Ethnic Cuisine Ala Carte",
+      "items": [
+        { "name": "Bario Rice", "price": 8.0 },
+        { "name": "Abbeng Arur Layun", "price": 10.0, "description": "Minced fish sprinkled with kiantan." },
+        { "name": "Labo Belatuh Pa’ Lungan", "price": 10.0, "description": "Shredded beef." },
+        { "name": "Bua’ Petar Pa’ Mada", "price": 10.0, "description": "Chopped petai beans and anchovies." },
+        { "name": "Arur Dalan Mixed Vegetable", "price": 10.0 },
+        { "name": "Kari Bua’ Kabar", "price": 6.0, "description": "Pineapple curry with Bario cinnamon." },
+        { "name": "Salad", "price": 6.0, "description": "Bued Main Salad." },
+        { "name": "Puluh", "price": 6.0, "description": "Chopped bamboo sprouts." },
+        { "name": "Pa’Lungan Dessert", "price": 8.0, "description": "Boiled and mashed tapioca with sugar palm." },
+        { "name": "Soup of Young Cucumber Leaves", "price": 6.0 },
+        { "name": "Cucumber Juice", "price": 6.5 }
+      ]
+    },
+    {
+      "slug": "all-day-menu",
+      "name": "All Day Menu",
+      "items": [
+        { "name": "Mee Kolok", "price": 12.0, "options": ["Red", "Black", "White"], "description": "Sarawak steamed noodle with sliced chicken, spiced soy sauce and chicken soup." },
+        { "name": "Laksa Sarawak", "price": 15.0, "description": "Sarawak rice vermicelli with fragrant soup, omelette, chicken, bean sprouts, prawns, lime and shrimp paste." },
+        { "name": "Soup Noodle", "price": 10.0, "options": ["Yellow noodle", "Kueh tiaw", "Bee hoon"], "description": "Noodle with sliced chicken, green vegetables and prawn." },
+        { "name": "Nasi Lemak with Chicken Curry", "price": 14.0 },
+        { "name": "Fried Noodle", "price": 12.0, "options": ["Yellow noodle", "Kueh tiaw", "Bee hoon"] },
+        { "name": "Hainanese Chicken Rice", "price": 15.0, "options": ["Steamed chicken", "Roasted chicken"] },
+        { "name": "Ayam Penyet", "price": 16.0 },
+        { "name": "Fried Rice with Chicken", "price": 15.0 },
+        { "name": "Fried Rice with Egg", "price": 14.0 },
+        { "name": "Fried Rice with Sambal", "price": 14.0 }
+      ]
+    },
+    {
+      "slug": "noodles",
+      "name": "Noodle",
+      "options": ["Yellow noodle", "Bee hoon", "Kueh tiaw", "Crispy noodle"],
+      "items": [
+        { "name": "Santubong Style", "price": 16.0 },
+        { "name": "Cantonese Style", "price": 16.0 },
+        { "name": "Hokkien Style", "price": 16.0 },
+        { "name": "Hong Kong Style", "price": 16.0 }
+      ]
+    },
+    {
+      "slug": "local-snacks",
+      "name": "Local Snacks",
+      "items": [
+        { "name": "Mix Fritters (Cucur Campur)", "price": 5.0, "size": "small" },
+        { "name": "Mix Fritters (Cucur Campur)", "price": 10.0, "size": "medium" }
+      ]
+    },
+    {
+      "slug": "beverages",
+      "name": "Beverages",
+      "items": [
+        { "name": "Air Bandung", "price": 5.0 }, { "name": "Air Bandung Cincau", "price": 6.0 },
+        { "name": "Barli", "price": 5.5 }, { "name": "Chinese Tea", "price": 5.0 },
+        { "name": "Coffee", "price": 4.5 }, { "name": "Cincau Sarsi", "price": 6.0 },
+        { "name": "Cordial Drinks", "price": 4.5, "options": ["Orange", "Sarsi", "Rose"] },
+        { "name": "Ginger With Honey", "price": 7.0 }, { "name": "Horlick", "price": 5.0 },
+        { "name": "Lemon Tea", "price": 5.0 }, { "name": "Lychee", "price": 6.0 },
+        { "name": "Lychee Lemon", "price": 6.0 }, { "name": "Lychee Susu", "price": 6.0 },
+        { "name": "Milo", "price": 5.0 }, { "name": "Nescafe", "price": 5.0 },
+        { "name": "Neslo", "price": 6.0 }, { "name": "Fresh Lime Syrup", "price": 7.0 },
+        { "name": "Teh", "price": 4.0 }, { "name": "Teh O Laici", "price": 6.0 },
+        { "name": "Teh C Special (3 Layer)", "price": 7.0 }, { "name": "Teh Tarik", "price": 5.0 },
+        { "name": "Teh Tarik Special (3 Layer)", "price": 7.0 }, { "name": "Tongkat Ali", "price": 6.0 }
+      ]
+    },
+    {
+      "slug": "fresh-fruit-juice",
+      "name": "Fresh Fruit Juice",
+      "items": [
+        { "name": "Apple", "price": 8.0 }, { "name": "Carrot Milk", "price": 8.0 },
+        { "name": "Honey Dew", "price": 8.0 }, { "name": "Honey Lemon", "price": 8.0 },
+        { "name": "Lychee Kang", "price": 8.0 }, { "name": "Lemon", "price": 7.0 },
+        { "name": "Lime", "price": 7.0 }, { "name": "Orange", "price": 8.0 },
+        { "name": "Pineapple", "price": 8.0 }, { "name": "Sour Plum With Kalamansi", "price": 8.0 },
+        { "name": "Watermelon", "price": 8.0 }, { "name": "Mix Fruits Juice", "price": 10.0 },
+        { "name": "Fresh Coconut", "price": 10.0, "availability": "seasonal" }
+      ]
+    },
+    {
+      "slug": "desserts",
+      "name": "Dessert",
+      "items": [
+        { "name": "Air Batu Campur (ABC)", "price": 8.0 },
+        { "name": "Cendol", "price": 8.0 },
+        { "name": "Moisture Corn", "price": 8.0 },
+        { "name": "White Lady", "price": 8.0 }
+      ]
+    }
+  ]
+}
