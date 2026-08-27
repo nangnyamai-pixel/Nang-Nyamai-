@@ -3,10 +3,10 @@
 import { useMemo, useState } from "react";
 import { FoodCard } from "@/components/customer/food-card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { CategoryNavigation } from "@/components/customer/category-navigation";
 import { QuantitySelector } from "@/components/customer/quantity-selector";
 import { OrderSummary } from "@/components/customer/order-summary";
+import { createClient } from "@/lib/supabase/client";
 
 type MenuItem = {
   id: string;
@@ -28,12 +28,12 @@ export function MenuBrowser({ categories, tableToken }: { categories: MenuCatego
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [tableNumber, setTableNumber] = useState("");
   const [specialNote, setSpecialNote] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card">("cash");
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
-  const [submittedOrder, setSubmittedOrder] = useState<{ order_number: string; total: number; status: string; payment_status: string } | null>(null);
+  const [submittedOrder, setSubmittedOrder] = useState<{ id: string; order_number: string; total: number; status: string; payment_status: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authChoiceOpen, setAuthChoiceOpen] = useState(false);
   const [cart, setCart] = useState<Record<string, { item: MenuItem; quantity: number }>>({});
   const cartItems = Object.values(cart);
   const cartCount = cartItems.reduce((total, entry) => total + entry.quantity, 0);
@@ -118,14 +118,17 @@ export function MenuBrowser({ categories, tableToken }: { categories: MenuCatego
         <div className="fixed inset-0 z-30 flex items-end justify-center bg-[var(--charcoal)]/60 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label="Checkout">
           <section className="w-full max-w-lg rounded-t-[var(--radius-xl)] bg-[var(--warm-ivory)] p-6 shadow-2xl sm:rounded-[var(--radius-xl)]">
             <div className="flex items-center justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--sarawak-red)]">Langkah terakhir</p><h2 className="mt-1 text-2xl font-bold text-[var(--charcoal)]">Checkout</h2></div><button type="button" onClick={() => setCheckoutOpen(false)} className="min-h-11 min-w-11 rounded-full bg-white text-xl" aria-label="Tutup checkout">×</button></div>
-            <form className="mt-6 space-y-4" onSubmit={async (event) => { event.preventDefault(); if (isSubmitting) return; setCheckoutError(null); if (!tableToken) { setCheckoutError("QR meja tidak lengkap. Sila buka halaman melalui QR code meja."); return; } setIsSubmitting(true); try { const response = await fetch("/api/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tableToken, specialNote, paymentMethod, items: cartItems.map(({ item, quantity }) => ({ menuItemId: item.id, quantity })) }) }); const result = await response.json(); if (!response.ok) { setCheckoutError(result.error ?? "Pesanan tidak dapat dihantar. Cart anda masih disimpan."); return; } setSubmittedOrder(result.order); setCheckoutOpen(false); setCart({}); } catch { setCheckoutError("Sambungan gagal. Cart anda masih disimpan."); } finally { setIsSubmitting(false); } }}>
-              <label className="block text-sm font-semibold text-[var(--charcoal)]">Nombor meja<Input value={tableNumber} onChange={(event) => setTableNumber(event.target.value)} placeholder="Contoh: T12" required className="mt-2" /></label>
+            <form className="mt-6 space-y-4" onSubmit={async (event) => { event.preventDefault(); if (isSubmitting) return; setCheckoutError(null); if (!tableToken) { setCheckoutError("QR meja tidak lengkap. Sila buka halaman melalui QR code meja."); return; } const { data: { user } } = await createClient().auth.getUser(); if (!user && !authChoiceOpen) { setAuthChoiceOpen(true); return; } setIsSubmitting(true); try { const response = await fetch("/api/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tableToken, specialNote, paymentMethod, items: cartItems.map(({ item, quantity }) => ({ menuItemId: item.id, quantity })) }) }); const result = await response.json(); if (!response.ok) { setCheckoutError(result.error ?? "Pesanan tidak dapat dihantar. Cart anda masih disimpan."); return; } setSubmittedOrder(result.order); setCheckoutOpen(false); setCart({}); } catch { setCheckoutError("Sambungan gagal. Cart anda masih disimpan."); } finally { setIsSubmitting(false); } }}>
+              <div className="rounded-[var(--radius-md)] border border-[var(--soft-sand)] bg-white px-4 py-3 text-sm text-[var(--secondary-text)]">
+                Meja dikesan daripada QR: <strong className="text-[var(--charcoal)]">{tableToken || "Belum dikesan"}</strong>
+              </div>
               <label className="block text-sm font-semibold text-[var(--charcoal)]">Nota khas <span className="font-normal text-[var(--secondary-text)]">(pilihan)</span><textarea value={specialNote} onChange={(event) => setSpecialNote(event.target.value)} maxLength={280} rows={3} placeholder="Contoh: kurang pedas..." className="mt-2 w-full rounded-[var(--radius-md)] border border-[var(--soft-sand)] bg-white p-4 text-sm text-[var(--charcoal)] placeholder:text-[var(--secondary-text)]" /></label>
               <fieldset><legend className="text-sm font-semibold text-[var(--charcoal)]">Kaedah bayaran</legend><div className="mt-2 grid grid-cols-2 gap-3">{(["cash", "card"] as const).map((method) => <label key={method} className={`flex min-h-12 cursor-pointer items-center justify-center rounded-full border text-sm font-semibold ${paymentMethod === method ? "border-[var(--sarawak-red)] bg-[var(--sarawak-red)] text-white" : "border-[var(--soft-sand)] bg-white text-[var(--charcoal)]"}`}><input type="radio" name="paymentMethod" value={method} checked={paymentMethod === method} onChange={() => setPaymentMethod(method)} className="sr-only" />{method === "cash" ? "Tunai" : "Kad"}</label>)}</div></fieldset>
               <OrderSummary subtotal={cartTotal} />
               {checkoutError && <p role="alert" className="rounded-[var(--radius-sm)] bg-red-50 p-3 text-sm text-red-700">{checkoutError}</p>}
               <Button type="submit" disabled={isSubmitting} className="w-full">{isSubmitting ? "Sedang menghantar..." : "Sahkan pesanan"}</Button>
             </form>
+            {authChoiceOpen && <div className="mt-4 rounded-[var(--radius-md)] border border-[var(--soft-sand)] bg-white p-4"><p className="text-sm font-semibold text-[var(--charcoal)]">Pilih cara untuk teruskan pesanan</p><div className="mt-3 grid gap-2 sm:grid-cols-2"><Button type="button" onClick={async () => { const next = `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname + window.location.search)}`; await createClient().auth.signInWithOAuth({ provider: "google", options: { redirectTo: next } }); }}>Log masuk Google</Button><Button type="button" variant="outline" onClick={() => setAuthChoiceOpen(false)}>Teruskan sebagai guest</Button></div></div>}
           </section>
         </div>
       )}

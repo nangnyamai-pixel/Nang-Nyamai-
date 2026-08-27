@@ -12,11 +12,12 @@ import type { Database } from "@/types/database";
  * middleware/route checks can be bypassed by calling APIs directly.
  */
 export async function updateSession(request: NextRequest) {
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    publishableKey!,
     {
       cookies: {
         getAll() {

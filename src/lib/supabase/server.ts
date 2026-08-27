@@ -11,10 +11,11 @@ import type { Database } from "@/types/database";
  */
 export async function createClient() {
   const cookieStore = await cookies();
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    publishableKey!,
     {
       cookies: {
         getAll() {

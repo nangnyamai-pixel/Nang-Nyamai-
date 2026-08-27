@@ -7,7 +7,7 @@
 | Status | Development baseline |
 | Produk | Web ordering dan operasi staf Budaya Restaurant |
 | Audiens | Product owner, developer, QA, DevOps dan operasi restoran |
-| Sumber | Kod repository, migrations Supabase dan PRD PDF v1.0 |
+| Sumber | Kod repository, Supabase yang dikonfigurasi dan PRD PDF v1.0 (16 Ogos 2026) |
 
 ## 1. Ringkasan produk
 
@@ -18,6 +18,15 @@ pesanan. Staf mengurus queue, dapur, status operasi dan pembayaran di kaunter.
 
 Produk menggunakan Next.js App Router dan Supabase. Harga dan transaksi
 ditentukan oleh server/database, bukan browser.
+
+### Nota verifikasi repository
+
+PRD PDF menetapkan `supabase/migrations/` sebagai deployment source of truth.
+Semakan workspace pada 19 Ogos 2026 mendapati folder itu belum wujud; hanya
+`supabase/sql/` dan `supabase/seed.sql` tersedia. Oleh itu, status migration
+dan claim database dalam dokumen ini mesti dianggap perlu disahkan sebelum
+perubahan schema atau deployment production. Jangan menandakan migration
+sebagai applied tanpa bukti daripada Supabase CLI/dashboard.
 
 ## 2. Matlamat
 

@@ -44,6 +44,14 @@ perubahan paling kecil yang memenuhi permintaan pengguna.
   belum dikonfigurasi.
 - Production deployment dan P0 security hardening belum selesai.
 
+### Repository verification note
+
+The PRD requires `supabase/migrations/` as the database deployment source of
+truth. A local workspace check on 19 Ogos 2026 found only `supabase/sql/` and
+`supabase/seed.sql`; treat the migration baseline as unverified until reviewed
+migration files and hosted migration history are reconciled. Do not silently
+claim that a migration is applied.
+
 Jangan tambah shadcn/ui, Framer Motion, Google Maps, payment gateway atau
 AutoCount integration melainkan pengguna meminta skop tersebut secara jelas.
 

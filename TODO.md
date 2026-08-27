@@ -30,6 +30,18 @@ kerana UI placeholder wujud.
 
 ## P0 - sebelum public production
 
+### Database migration source of truth
+
+- [ ] Reconcile PRD claim of four applied migrations with the local workspace.
+- [ ] Create reviewed, idempotent files under `supabase/migrations/` from the
+      active schema/RPC definitions; do not treat `supabase/sql/` as the final
+      deployment history.
+- [ ] Verify migration history against the hosted Supabase project before
+      applying or editing any production schema.
+
+Exit condition: A fresh environment can reproduce the required schema and
+RPCs from reviewed migrations, and hosted migration history is documented.
+
 ### QR dan guest security
 
 - [ ] Reka bentuk signed table token yang mengandungi table identity, expiry
@@ -188,4 +200,3 @@ dan aliran operasi.
 - [ ] Jalankan `npm exec tsc -- --noEmit`.
 - [ ] Jalankan `npm run build`.
 - [ ] Kemas kini README/PRD/TODO apabila status atau kontrak berubah.
-
