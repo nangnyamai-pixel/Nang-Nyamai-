@@ -41,14 +41,31 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isStaffRoute = path.startsWith("/staff");
+  const isStaffLogin = path === "/staff/login";
+  const isStaffRoute = path.startsWith("/staff") && !isStaffLogin;
   const isAdminRoute = path.startsWith("/admin");
 
   if ((isStaffRoute || isAdminRoute) && !user) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/auth/login";
+    redirectUrl.pathname = isStaffRoute ? "/staff/login" : "/auth/login";
     redirectUrl.searchParams.set("redirectTo", path);
     return NextResponse.redirect(redirectUrl);
+  }
+
+  if (isStaffLogin && user) {
+    const { data: staff } = await supabase
+      .from("staff_profiles")
+      .select("is_active")
+      .eq("auth_user_id", user.id)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (staff) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/staff/orders";
+      redirectUrl.search = "";
+      return NextResponse.redirect(redirectUrl);
+    }
   }
 
   // Role-based checks (staff vs admin) happen in lib/auth using the

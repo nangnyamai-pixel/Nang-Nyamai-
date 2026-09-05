@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 import type { UserRole } from "@/types/database";
+import type { StaffProfile } from "@/types/database";
 
 /**
  * Returns the authenticated user's id and role, or null if not signed in.
@@ -33,6 +34,25 @@ export async function getCurrentUserRole(): Promise<{
   if (error || !profile) return null;
 
   return { userId: user.id, role: profile.role };
+}
+
+/** Returns the active staff profile belonging to the current Auth user. */
+export async function getCurrentStaff(): Promise<StaffProfile | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from("staff_profiles")
+    .select("*")
+    .eq("auth_user_id", user.id)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  return error ? null : data;
 }
 
 /** Throws-free helper for checking whether the current user has one of the given roles. */

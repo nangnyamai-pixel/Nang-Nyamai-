@@ -24,9 +24,46 @@ export type PaymentStatus = "unpaid" | "paid";
 
 export type PaymentMethod = "cash" | "card";
 
+export type StaffRole = "cashier" | "waitress" | "staff";
+
+export type StaffProfile =
+  Database["public"]["Tables"]["staff_profiles"]["Row"];
+export type Order = Database["public"]["Tables"]["orders"]["Row"];
+export type OrderItem = Database["public"]["Tables"]["order_items"]["Row"];
+
 export interface Database {
   public: {
     Tables: {
+      staff_profiles: {
+        Row: {
+          id: string;
+          auth_user_id: string;
+          staff_id: string;
+          name: string;
+          role: StaffRole;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          auth_user_id: string;
+          staff_id: string;
+          name: string;
+          role?: StaffRole;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          staff_id?: string;
+          name?: string;
+          role?: StaffRole;
+          is_active?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           id: string;
