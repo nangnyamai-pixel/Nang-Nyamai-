@@ -14,7 +14,7 @@ export function StaffSidebar({ staffName, staffRole }: { staffName: string; staf
     <header className="staff-mobile-header"><span className="staff-mobile-brand">NangNyamai <small>STAFF</small></span><button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="staff-navigation">Menu</button></header>
     <aside id="staff-navigation" className={`staff-sidebar ${open ? "is-open" : ""}`}>
       <div><Link href="/staff/orders" className="staff-sidebar-brand" onClick={() => setOpen(false)}><span className="staff-sidebar-mark">N</span><span>NangNyamai<small>Staff workspace</small></span></Link>
-        <nav aria-label="Staff navigation"><p>Workspace</p><Link className={pathname.startsWith("/staff/orders") ? "active" : ""} href="/staff/orders" onClick={() => setOpen(false)}><QueueIcon /> Order Queue</Link><span className="staff-nav-disabled" aria-disabled="true"><CardIcon /> Payment Process <small>Soon</small></span></nav>
+        <nav aria-label="Staff navigation"><p>Workspace</p><Link className={pathname.startsWith("/staff/orders") ? "active" : ""} href="/staff/orders" onClick={() => setOpen(false)}><QueueIcon /> Order Queue</Link><Link className={pathname.startsWith("/staff/payments") ? "active" : ""} href="/staff/payments" onClick={() => setOpen(false)}><CardIcon /> Payment Process</Link></nav>
       </div>
       <div className="staff-sidebar-footer"><div className="staff-profile-chip"><span>{staffName.charAt(0).toUpperCase()}</span><p>{staffName}<small>{staffRole}</small></p></div><button type="button" onClick={logout} disabled={signingOut}><LogoutIcon /> {signingOut ? "Signing out…" : "Logout"}</button></div>
     </aside>

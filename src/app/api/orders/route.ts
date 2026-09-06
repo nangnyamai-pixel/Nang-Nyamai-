@@ -19,7 +19,7 @@ function isValidItem(value: unknown): value is { menuItemId: string; quantity: n
 export async function POST(request: Request) {
   let body: OrderInput;
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid request body." }, { status: 400 }); }
-  const developmentPreview = process.env.NODE_ENV === "development";
+  const developmentPreview = process.env.NODE_ENV === "development" && process.env.ORDER_PREVIEW_MODE === "true";
   if (typeof body.tableToken !== "string" || !Array.isArray(body.items) || body.items.length === 0 || body.items.length > 50 || !body.items.every((item) => developmentPreview ? isPreviewItem(item) : isValidItem(item))) return NextResponse.json({ error: "Order details are invalid." }, { status: 400 });
   if (body.specialNote !== undefined && (typeof body.specialNote !== "string" || body.specialNote.length > 280)) return NextResponse.json({ error: "Special note is invalid." }, { status: 400 });
   if (body.paymentMethod !== undefined && body.paymentMethod !== "cash" && body.paymentMethod !== "card") return NextResponse.json({ error: "Payment method is invalid." }, { status: 400 });

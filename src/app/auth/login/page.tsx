@@ -3,6 +3,7 @@
 import { FormEvent, Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { ensureCustomerProfile } from "@/lib/auth/customer-profile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -13,7 +14,7 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const guestDestination = searchParams.get("redirectTo") || "/order";
+  const destination = searchParams.get("redirectTo") || searchParams.get("next") || "/order";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,7 +27,12 @@ function LoginForm() {
       setLoading(false);
       return;
     }
-    router.replace(searchParams.get("redirectTo") || "/");
+    if (!result.data.user || await ensureCustomerProfile(supabase, result.data.user)) {
+      setError("Unable to prepare your customer profile. Please try again.");
+      setLoading(false);
+      return;
+    }
+    router.replace(destination);
     router.refresh();
   }
 
@@ -34,8 +40,7 @@ function LoginForm() {
     setError(null);
     setLoading(true);
     const supabase = createClient();
-    const next = searchParams.get("redirectTo") || "/";
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(destination)}`;
     const result = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo },
@@ -62,7 +67,7 @@ function LoginForm() {
         <Button type="button" variant="outline" disabled={loading} onClick={signInWithGoogle} className="w-full">
           <span className="mr-2 text-base font-bold">G</span> Teruskan dengan Google
         </Button>
-        <a href={guestDestination} className="mt-4 flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-semibold text-[var(--secondary-text)] transition hover:bg-[var(--soft-sand)]/40 hover:text-[var(--charcoal)]">
+        <a href={destination} className="mt-4 flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-semibold text-[var(--secondary-text)] transition hover:bg-[var(--soft-sand)]/40 hover:text-[var(--charcoal)]">
           Teruskan sebagai guest
         </a>
       </section>

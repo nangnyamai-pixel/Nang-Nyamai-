@@ -27,7 +27,7 @@ export const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   received: ["verified", "cancelled"],
   verified: ["preparing", "cancelled"],
   preparing: ["ready", "cancelled"],
-  ready: ["completed", "cancelled"],
+  ready: ["cancelled"],
   completed: [],
   cancelled: [],
 };

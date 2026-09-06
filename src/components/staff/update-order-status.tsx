@@ -8,7 +8,7 @@ import { ORDER_STATUS_LABELS, ORDER_STATUS_TRANSITIONS } from "@/constants/statu
 import type { OrderStatus } from "@/types/database";
 
 type StatusOrder = { id: string; order_number: string; status: OrderStatus; total: number; restaurant_tables: { table_number: string } | null };
-const choices: OrderStatus[] = ["preparing", "ready", "completed", "cancelled"];
+const choices: OrderStatus[] = ["preparing", "ready", "cancelled"];
 const steps: { status: OrderStatus; label: string }[] = [{ status: "received", label: "New" }, { status: "preparing", label: "Preparing" }, { status: "ready", label: "Ready" }, { status: "completed", label: "Completed" }];
 
 export function UpdateOrderStatus({ orderId }: { orderId: string }) {

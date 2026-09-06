@@ -19,15 +19,16 @@ export default async function OrderPage({ searchParams }: { searchParams: Search
       is_available: true,
     })),
   }));
-  let categories = previewCategories;
+  const hasSupabase = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY));
+  let categories = hasSupabase ? [] : previewCategories;
 
-  if (process.env.NEXT_PUBLIC_SUPABASE_URL && (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)) {
+  if (hasSupabase) {
     const supabase = await createClient();
     const [{ data: liveCategories }, { data: liveItems }] = await Promise.all([
       supabase.from("categories").select("id, name, slug, display_order").eq("is_active", true).order("display_order"),
       supabase.from("menu_items").select("id, category_id, name, description, price, is_available, is_popular").order("name"),
     ]);
-    if (liveCategories?.length && liveItems?.length) {
+    if (liveCategories && liveItems) {
       categories = liveCategories.map((category) => ({
         id: category.id,
         name: category.name,
@@ -50,7 +51,7 @@ export default async function OrderPage({ searchParams }: { searchParams: Search
         <p className="mt-2 text-sm text-[var(--secondary-text)]">{table ? `Meja ${table}` : "Preview menu"} · Harga tertakluk kepada SST 6%</p>
       </header>
       <section className="mx-auto max-w-5xl px-5 pb-12 sm:px-8">
-        <MenuBrowser categories={categories} tableToken={token || table} />
+        <MenuBrowser categories={categories} tableToken={token || table} tableLabel={table || token} />
       </section>
     </main>
   );

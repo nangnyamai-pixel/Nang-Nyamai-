@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 :root {
-<<<<<<< Updated upstream
   --background: #fff8eb;
   --foreground: #161616;
   --warm-ivory: #fff8eb;
@@ -20,16 +19,12 @@
   --radius-lg: 18px;
   --radius-xl: 24px;
   --shadow-soft: 0 12px 32px rgb(22 22 22 / 10%);
-=======
-  --background: #f6f4ef;
-  --foreground: #211e19;
   --staff-ink: #211e19;
   --staff-muted: #746f66;
   --staff-line: #e7e1d7;
   --staff-cream: #f7f4ed;
   --staff-accent: #a8492e;
   --staff-green: #55765c;
->>>>>>> Stashed changes
 }
 
 @theme inline {

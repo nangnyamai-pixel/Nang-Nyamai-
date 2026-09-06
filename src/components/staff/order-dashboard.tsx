@@ -7,7 +7,7 @@ import type { OrderStatus } from "@/types/database";
 
 type QueueFilter = "active" | "received" | "completed";
 type RawQueueOrder = {
-  id: string; order_number: string; status: OrderStatus; total: number; created_at: string;
+  id: string; order_number: string; status: OrderStatus; total: number; created_at: string; updated_at: string;
   restaurant_tables: { table_number: string } | null;
   order_items: { quantity: number }[];
 };
@@ -32,7 +32,7 @@ export function OrderDashboard() {
   const loadOrders = useCallback(async (background = false) => {
     if (!background) setLoading(true);
     setError("");
-    let query = supabase.from("orders").select("id, order_number, status, total, created_at, restaurant_tables!orders_table_id_fkey(table_number), order_items(quantity)").order("created_at", { ascending: false });
+    let query = supabase.from("orders").select("id, order_number, status, total, created_at, updated_at, restaurant_tables!orders_table_id_fkey(table_number), order_items(quantity)").order("created_at", { ascending: false });
     if (filter === "active") query = query.in("status", ["received", "preparing", "ready"]);
     else query = query.eq("status", filter);
     if (debouncedSearch) {
@@ -42,14 +42,16 @@ export function OrderDashboard() {
     const [ordersResult, receivedResult, completedResult] = await Promise.all([
       query,
       supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "received"),
-      supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "completed"),
+      supabase.from("orders").select("updated_at").eq("status", "completed"),
     ]);
     if (ordersResult.error || receivedResult.error || completedResult.error) {
       setError("Unable to load orders."); setLoading(false); return;
     }
     const rows = (ordersResult.data ?? []) as unknown as RawQueueOrder[];
     setOrders(rows.map(({ restaurant_tables, order_items, ...order }) => ({ ...order, tableNumber: restaurant_tables?.table_number ?? "—", itemCount: order_items.reduce((sum, item) => sum + item.quantity, 0) })));
-    setCounts({ received: receivedResult.count ?? 0, completed: completedResult.count ?? 0 });
+    const today = malaysiaDateKey(new Date());
+    const completedToday = (completedResult.data ?? []).filter((row) => malaysiaDateKey(row.updated_at) === today).length;
+    setCounts({ received: receivedResult.count ?? 0, completed: completedToday });
     setUpdatedAt(new Date()); setLoading(false);
   }, [debouncedSearch, filter, supabase]);
 
@@ -91,7 +93,13 @@ function OrderCard({ order }: { order: QueueOrder }) {
   const destination = order.status === "received" ? `/staff/orders/${order.id}` : `/staff/orders/${order.id}/status`;
   const label = order.status === "received" ? "NEW" : order.status === "preparing" ? "PREPARING" : order.status === "ready" ? "READY" : "COMPLETED";
   const actionLabel = order.status === "received" ? "Open order details" : order.status === "preparing" ? "Update preparing order" : order.status === "ready" ? "Update ready order" : "View completed order";
-  return <article className="order-card"><span className={`order-status status-${order.status}`}>{label}</span><div className="order-identity"><strong>#{order.order_number}</strong><span>Table {order.tableNumber} <i /> {new Date(order.created_at).toLocaleTimeString("en-MY", { hour: "numeric", minute: "2-digit" })}</span></div><div className="order-metrics"><span>{order.itemCount} {order.itemCount === 1 ? "item" : "items"}</span><strong>{money.format(Number(order.total)).replace("RM", "RM ")}</strong></div><Link className={`order-next order-next-${order.status}`} href={destination} aria-label={actionLabel} title={actionLabel}>→</Link></article>;
+  const timestamp = order.status === "completed" ? order.updated_at : order.created_at;
+  return <article className="order-card"><span className={`order-status status-${order.status}`}>{label}</span><div className="order-identity"><strong>#{order.order_number}</strong><span>Table {order.tableNumber} <i /> {new Date(timestamp).toLocaleTimeString("en-MY", { timeZone: "Asia/Kuala_Lumpur", hour: "numeric", minute: "2-digit" })}</span></div><div className="order-metrics"><span>{order.itemCount} {order.itemCount === 1 ? "item" : "items"}</span><strong>{money.format(Number(order.total)).replace("RM", "RM ")}</strong></div><Link className={`order-next order-next-${order.status}`} href={destination} aria-label={actionLabel} title={actionLabel}>→</Link></article>;
+}
+
+function malaysiaDateKey(value: string | Date) {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kuala_Lumpur", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(value));
+  return parts.filter((part) => part.type !== "literal").map((part) => part.value).join("-");
 }
 
 function OrderSkeleton() { return <div className="order-list" aria-label="Loading orders">{[1, 2, 3].map((item) => <div className="order-card skeleton" key={item}><span /><div><i /><i /></div><div><i /><i /></div></div>)}</div>; }

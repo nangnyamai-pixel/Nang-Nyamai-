@@ -10,15 +10,13 @@ membuat integrasi AutoCount tanpa discovery serta arahan berasingan.
 
 ## Status semasa
 
-<<<<<<< Updated upstream
 Baseline aplikasi telah meliputi customer menu/detail/cart/checkout, Supabase
 Auth callback, staff dashboard/queue/kitchen/history, status/payment RPC,
 RLS dan Sarawak Contemporary design system. Customer tracking/history,
 feedback, rewards, admin console dan production hardening masih belum lengkap.
-=======
-**STAFF phase 1 — authentication and live order queue.** The customer and
-admin applications remain at their Sprint 0 placeholders.
->>>>>>> Stashed changes
+STAFF phase 1 authentication, live order queue, order details, kitchen
+confirmation and status workflow are also present. Customer tracking/history,
+feedback, rewards, admin console and production hardening remain incomplete.
 
 Menu pelanggan masih menggunakan `data/budaya-restaurant-menu-2025.json`.
 Dataset tersebut bersumber daripada PDF menu 2025 dan kekal
@@ -45,7 +43,6 @@ Rujukan utama:
 Gunakan Server Components secara lalai. Client Components hanya untuk browser
 state, event handling atau API client-only.
 
-<<<<<<< Updated upstream
 ## Struktur penting
 
 ```text
@@ -56,28 +53,6 @@ src/lib/               Supabase clients, auth, validation dan data helpers
 data/                  dataset menu 2025 (interim; bukan source live produksi)
 supabase/sql/          SQL legacy/proposal dalam workspace semasa
 supabase/migrations/   deployment source of truth yang diperlukan oleh PRD
-=======
-```
-src/
-  app/
-    (customer)/order/   # table QR landing → menu → cart → order (Sprint 1)
-    staff/               # Staff-ID login + protected live order queue
-    admin/               # admin menu & analytics (Sprint 5)
-    auth/callback/        # Supabase OAuth callback route
-    api/                  # route handlers, as needed
-  components/
-    customer/ staff/ admin/ shared/ ui/
-  lib/
-    supabase/    # browser + server + middleware Supabase clients
-    auth/        # server-side role lookup / authorization helpers
-    database/    # data-access helpers (added as features are built)
-    validation/  # zod schemas for server-side input validation
-    utils/
-  hooks/
-  types/         # hand-written DB types (Sprint 0) → generated later
-  services/      # reusable business-logic services
-  constants/     # centralized status & role constants
->>>>>>> Stashed changes
 ```
 
 Percanggahan repository yang diketahui pada 19 Ogos 2026: workspace ini
@@ -128,22 +103,12 @@ membaca `menu_items.is_available` secara live daripada Supabase.
 
 ## Supabase dan Auth
 
-<<<<<<< Updated upstream
 Supabase ialah backend utama. Semua public tables mesti mempunyai RLS.
 Mutation penting menggunakan server action, route handler atau RPC yang
 mengesahkan role dan input. Kontrak utama yang dirujuk PRD ialah:
-=======
-1. Create a project at [supabase.com](https://supabase.com).
-2. Copy the Project URL and anon public key into `.env.local`.
-3. Review and run `supabase/sql/001_schema.sql` in the SQL editor (proposed
-   schema — read it first, it is not applied automatically by this repo).
-4. Review and run `supabase/sql/002_rls_policies.sql` (proposed RLS
-   policies — also for review before running).
-5. Run `supabase/sql/003_staff_auth_and_order_queue.sql` to add staff
-   profiles, active-staff RLS checks, and the orders Realtime publication.
-6. Generate typed database types once the schema is live (optional, replaces
-   the hand-written `src/types/database.ts`):
->>>>>>> Stashed changes
+For local setup, create a Supabase project, copy its URL and anon public key
+into `.env.local`, then review and run the SQL files in `supabase/sql/` in
+order before generating live database types.
 
 - `create_customer_order` - transactional pricing, option validation dan
   `client_request_id` idempotency.
