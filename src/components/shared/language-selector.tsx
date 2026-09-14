@@ -1,0 +1,3 @@
+"use client";
+import { useLanguage, type Locale } from "@/lib/i18n";
+export function LanguageSelector() { const { locale, setLocale, t } = useLanguage(); return <div className="inline-flex min-h-11 items-center gap-1 rounded-full border border-[var(--border-soft)] bg-[var(--surface)] p-1" aria-label={t("language")}>{(["en", "ms"] as Locale[]).map((option) => <button key={option} type="button" onClick={() => setLocale(option)} aria-pressed={locale === option} className={`min-h-9 rounded-full px-3 text-xs font-bold transition ${locale === option ? "bg-[var(--primary-green)] text-white" : "text-[var(--brown-dark)] hover:bg-[var(--surface-muted)]"}`}>{option === "en" ? t("english") : t("bahasaMelayu")}</button>)}</div>; }

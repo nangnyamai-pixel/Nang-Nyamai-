@@ -67,29 +67,35 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
+          member_id: string;
           full_name: string | null;
           email: string | null;
           role: UserRole;
           avatar_url: string | null;
+          phone: string | null;
           birthday: string | null;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id: string;
+          member_id?: string;
           full_name?: string | null;
           email?: string | null;
           role?: UserRole;
           avatar_url?: string | null;
+          phone?: string | null;
           birthday?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
+          member_id?: string;
           full_name?: string | null;
           email?: string | null;
           role?: UserRole;
           avatar_url?: string | null;
+          phone?: string | null;
           birthday?: string | null;
           updated_at?: string;
         };

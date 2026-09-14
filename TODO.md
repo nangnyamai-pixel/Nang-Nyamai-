@@ -1,6 +1,6 @@
 # NangNyamai TODO
 
-Dikemas kini: **17 Ogos 2026**
+Dikemas kini: **7 September 2026**
 
 Gunakan fail ini untuk kerja yang belum selesai. Keperluan dan acceptance
 criteria berada dalam [PRD.md](PRD.md). Jangan menandakan tugasan selesai hanya
@@ -26,18 +26,16 @@ kerana UI placeholder wujud.
 - [x] Staff role gate, dashboard, queue, kitchen dan history
 - [x] Staff order status RPC dan payment RPC
 - [x] RLS aktif pada semua jadual public baseline
-- [x] Empat migrations baseline dan reproducible menu seed
+- [x] Profile provisioning migration dan backfill Auth users
+- [x] Global English/Bahasa Melayu provider dan shared language selector asas
 
 ## P0 - sebelum public production
 
 ### Database migration source of truth
 
-- [ ] Reconcile PRD claim of four applied migrations with the local workspace.
-- [ ] Create reviewed, idempotent files under `supabase/migrations/` from the
-      active schema/RPC definitions; do not treat `supabase/sql/` as the final
-      deployment history.
-- [ ] Verify migration history against the hosted Supabase project before
-      applying or editing any production schema.
+- [ ] Reconcile PRD claim of baseline migrations with the local workspace.
+- [x] Add reviewed profile provisioning migration under `supabase/migrations/`.
+- [x] Apply and verify profile trigger/backfill against hosted Supabase.
 
 Exit condition: A fresh environment can reproduce the required schema and
 RPCs from reviewed migrations, and hosted migration history is documented.
@@ -143,6 +141,8 @@ dan aliran operasi.
 - [ ] Lengkapkan feedback untuk completed order sahaja.
 - [ ] Hadkan satu feedback bagi setiap order/customer yang sah.
 - [ ] Tambah customer history filters dan useful empty states.
+- [ ] Complete translation-key audit for checkout confirmation and order
+      tracking so no application-owned Malay text remains in English locale.
 
 ### Admin
 
@@ -172,7 +172,7 @@ dan aliran operasi.
 
 - [ ] Tentukan rewards model, earning rules dan redemption rules.
 - [ ] PWA/offline enhancement selepas live-data strategy stabil.
-- [ ] Multilingual content strategy.
+- [ ] Extend bilingual translation coverage to future live staff/admin modules.
 - [ ] Push notification discovery.
 - [ ] AutoCount/POS integration discovery selepas API dan data ownership
       disahkan.

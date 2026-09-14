@@ -2,8 +2,8 @@
 
 | Medan | Nilai |
 |---|---|
-| Versi | 1.1 |
-| Dikemas kini | 17 Ogos 2026 |
+| Versi | 1.2 |
+| Dikemas kini | 7 September 2026 |
 | Status | Development baseline |
 | Produk | Web ordering dan operasi staf Budaya Restaurant |
 | Audiens | Product owner, developer, QA, DevOps dan operasi restoran |
@@ -22,11 +22,11 @@ ditentukan oleh server/database, bukan browser.
 ### Nota verifikasi repository
 
 PRD PDF menetapkan `supabase/migrations/` sebagai deployment source of truth.
-Semakan workspace pada 19 Ogos 2026 mendapati folder itu belum wujud; hanya
-`supabase/sql/` dan `supabase/seed.sql` tersedia. Oleh itu, status migration
-dan claim database dalam dokumen ini mesti dianggap perlu disahkan sebelum
-perubahan schema atau deployment production. Jangan menandakan migration
-sebagai applied tanpa bukti daripada Supabase CLI/dashboard.
+Migration profile provisioning kini berada di
+`supabase/migrations/20260907000000_profile_provisioning.sql` dan telah
+dijalankan serta disahkan pada hosted Supabase project. Migration tersebut
+mewujudkan trigger `auth.users -> public.profiles` dan backfill profile yang
+hilang tanpa menukar profile sedia ada.
 
 ## 2. Matlamat
 
@@ -40,6 +40,8 @@ sebagai applied tanpa bukti daripada Supabase CLI/dashboard.
   responsive dan boleh diakses.
 - **OBJ-06:** Sediakan asas keselamatan, pemerhatian dan deployment yang sesuai
   untuk operasi restoran sebenar.
+- **OBJ-07:** Sediakan pengalaman bilingual yang konsisten untuk semua
+  permukaan aplikasi yang telah dilaksanakan.
 
 ## 3. Bukan skop baseline
 
@@ -73,6 +75,8 @@ Route `/staff` memerlukan `staff` atau `admin`. Route `/admin` memerlukan
 | TXN-02 | Atomic order creation | Dilaksana | Server validation dan idempotency |
 | AUTH-01 | Email magic link | Dilaksana | Supabase Auth callback dan session |
 | AUTH-02 | Google authentication | Separa | Kod tersedia; provider dan production QA belum disahkan |
+| UX-LOC-01 | English/Bahasa Melayu UI | Separa | Global provider, persistence dan switcher tersedia; audit semua label masih berjalan |
+| AUTH-03 | Profile provisioning | Dilaksana | Trigger Auth dan backfill hosted telah disahkan; `profiles.id = auth.users.id` |
 | OPS-01 | Dashboard, queue, kitchen dan history | Dilaksana | Role gate, data langsung dan status progression |
 | OPS-02 | Menu availability | Separa | RPC wujud; feature flag off kerana menu pelanggan masih JSON |
 | CUS-03 | Customer tracking/history | Separa | Route wujud; guest ownership dan Realtime belum siap |
@@ -137,6 +141,7 @@ fungsi sebenar.
 | FR-AUTH-004 | Map user kepada role | Dilaksana | `profiles.id` merujuk `auth.users.id` |
 | FR-AUTH-005 | Lindungi staff/admin routes | Dilaksana | Unauthorized role ditolak pada server dan database |
 | FR-AUTH-006 | Logout | Dilaksana | Session tamat dan protected routes tidak lagi boleh diakses |
+| FR-AUTH-007 | Provision profile Auth | Dilaksana | Trigger mencipta profile customer untuk user baharu dan backfill user lama |
 
 ## 10. Keperluan staf dan dapur
 
@@ -266,6 +271,9 @@ UX requirements:
 - Loading, empty, error, unavailable dan offline states mesti jelas.
 - Gunakan primitives dalam `src/components/ui`; jangan tambah style ad hoc
   apabila token/variant sedia ada mencukupi.
+- Localization menggunakan locale `en` dan `ms`, English sebagai default,
+  persistence browser dan shared language selector. Jangan terjemah table
+  codes, UUID, order IDs, nama menu atau user-generated content.
 
 ## 17. Keperluan bukan fungsi
 
@@ -279,7 +287,7 @@ UX requirements:
 | NFR-006 | Security | RLS, least privilege, signed QR, rate limit dan secret management |
 | NFR-007 | Privacy | Minimum PII dan retention policy yang diluluskan |
 | NFR-008 | Maintainability | TypeScript, lint/typecheck/build dan reviewed migrations |
-| NFR-009 | Localization | BM/English, MYR dan Asia/Kuala_Lumpur |
+| NFR-009 | Localization | BM/English, MYR dan Asia/Kuala_Lumpur; semua application-owned UI text mesti melalui translation keys |
 
 ## 18. Deployment requirements
 

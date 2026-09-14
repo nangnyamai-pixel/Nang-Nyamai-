@@ -51,8 +51,15 @@ export async function POST(request: Request) {
   let guestSessionId = cookieStore.get("nangnyamai_guest_session")?.value;
   if (!user && !guestSessionId) { guestSessionId = crypto.randomUUID(); cookieStore.set("nangnyamai_guest_session", guestSessionId, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", maxAge: 60 * 60 * 24 }); }
   const orderNumber = `NN-${Date.now().toString(36).toUpperCase()}`;
-  const { data: order, error: orderError } = await supabase.from("orders").insert({ order_number: orderNumber, table_id: table.id, customer_id: user?.id ?? null, guest_session_id: user ? null : guestSessionId!, subtotal, service_charge: 0, total: subtotal, special_note: typeof body.specialNote === "string" ? body.specialNote : null, payment_method: body.paymentMethod === "card" ? "card" : "cash" }).select("id, order_number, total, status, payment_status").single();
-  if (orderError || !order) return NextResponse.json({ error: "Unable to create order." }, { status: 500 });
+  const orderId = crypto.randomUUID();
+  const orderPayload = { id: orderId, order_number: orderNumber, table_id: table.id, customer_id: user?.id ?? null, guest_session_id: user ? null : guestSessionId!, subtotal, service_charge: 0, total: subtotal, special_note: typeof body.specialNote === "string" ? body.specialNote : null, payment_method: (body.paymentMethod === "card" ? "card" : "cash") as "cash" | "card" };
+  const orderInsert = user
+    ? await supabase.from("orders").insert(orderPayload).select("id, order_number, total, status, payment_status").single()
+    : await supabase.from("orders").insert(orderPayload);
+  const order = user ? orderInsert.data : { id: orderId, order_number: orderNumber, total: subtotal, status: "received", payment_status: "unpaid" };
+  const orderError = orderInsert.error;
+  if (orderError) return NextResponse.json({ error: "Unable to create order." }, { status: 500 });
+  if (!order) return NextResponse.json({ error: "Unable to create order." }, { status: 500 });
   const { error: itemsError } = await supabase.from("order_items").insert(orderItems.map(({ menu, quantity }) => ({ order_id: order.id, menu_item_id: menu.id, item_name_snapshot: menu.name, unit_price: menu.price, quantity })));
   if (itemsError) return NextResponse.json({ error: "Unable to save order items." }, { status: 500 });
   return NextResponse.json({ order }, { status: 201 });

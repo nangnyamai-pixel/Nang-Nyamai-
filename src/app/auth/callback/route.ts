@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { ensureCustomerProfile } from "@/lib/auth/customer-profile";
 
 /**
  * Handles the Supabase OAuth redirect after a customer signs in with Google.
@@ -24,11 +23,6 @@ export async function GET(request: NextRequest) {
     const { error, data } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data.user) {
-      // Ensure a profile row exists for this user with role = customer.
-      // Uses upsert so repeat sign-ins don't fail or duplicate rows.
-      const profileError = await ensureCustomerProfile(supabase, data.user);
-      if (profileError) return NextResponse.redirect(`${origin}/auth/auth-error`);
-
       return NextResponse.redirect(`${origin}${next}`);
     }
   }

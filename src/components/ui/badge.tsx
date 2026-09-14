@@ -3,8 +3,8 @@ import type { HTMLAttributes } from "react";
 type BadgeTone = "brand" | "accent" | "neutral" | "success" | "danger";
 
 const tones: Record<BadgeTone, string> = {
-  brand: "bg-[var(--sarawak-red)] text-white",
-  accent: "bg-[var(--heritage-yellow)] text-[var(--charcoal)]",
+  brand: "bg-[var(--primary-green)] text-white",
+  accent: "bg-[var(--gold-accent)] text-[var(--brown-dark)]",
   neutral: "bg-[var(--soft-sand)]/50 text-[var(--secondary-text)]",
   success: "bg-emerald-100 text-emerald-800",
   danger: "bg-red-100 text-red-800",

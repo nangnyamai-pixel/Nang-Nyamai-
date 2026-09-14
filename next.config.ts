@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   // while allowing local validation to redirect generated files to a writable
   // directory with `NEXT_DIST_DIR`.
   distDir: process.env.NEXT_DIST_DIR ?? ".next",
+  allowedDevOrigins: ["172.20.10.9"],
 };
 
 export default nextConfig;
