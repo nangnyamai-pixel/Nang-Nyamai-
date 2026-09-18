@@ -347,6 +347,15 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      get_receipt_customer_profile: {
+        Args: { p_order_id: string };
+        Returns: { full_name: string | null; phone: string | null; member_id: string | null }[];
+      };
+      send_order_to_kitchen: {
+        Args: { p_order_id: string };
+        Returns: { id: string; status: string }[];
+      };
+    };
   };
 }
