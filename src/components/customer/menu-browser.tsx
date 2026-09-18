@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useLanguage } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/shared/language-selector";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { FoodMatch } from "@/components/customer/food-match";
 
 type MenuItem = {
   id: string;
@@ -19,6 +20,7 @@ type MenuItem = {
   is_available: boolean;
   image?: string | null;
   is_signature?: boolean;
+  categoryName: string;
 };
 
 type MenuCategory = {
@@ -27,7 +29,7 @@ type MenuCategory = {
   menu_items: MenuItem[];
 };
 
-export function MenuBrowser({ categories, tableToken, tableLabel }: { categories: MenuCategory[]; tableToken: string; tableLabel?: string }) {
+export function MenuBrowser({ categories, tableToken, popularIds = [] }: { categories: MenuCategory[]; tableToken: string; popularIds?: string[] }) {
   const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState("all");
   const [query, setQuery] = useState("");
@@ -42,9 +44,11 @@ export function MenuBrowser({ categories, tableToken, tableLabel }: { categories
   const [authChoiceOpen, setAuthChoiceOpen] = useState(false);
   const [guestCheckoutAllowed, setGuestCheckoutAllowed] = useState(false);
   const [cart, setCart] = useState<Record<string, { item: MenuItem; quantity: number }>>({});
+  const [recommendedIds, setRecommendedIds] = useState<Set<string>>(() => new Set());
   const cartItems = Object.values(cart);
   const cartCount = cartItems.reduce((total, entry) => total + entry.quantity, 0);
   const cartTotal = cartItems.reduce((total, entry) => total + Number(entry.item.price) * entry.quantity, 0);
+  const matchItems = categories.flatMap((category) => category.menu_items.filter((item) => item.is_available).map((item) => ({ ...item, categoryName: category.name })));
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return categories
@@ -73,6 +77,7 @@ export function MenuBrowser({ categories, tableToken, tableLabel }: { categories
         </label>
         <CategoryNavigation categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
       </div>
+      <FoodMatch items={matchItems} onSelect={(item) => setSelectedItem(item)} onAdd={(item) => { setRecommendedIds((current) => new Set(current).add(item.id)); setCart((current) => ({ ...current, [item.id]: { item, quantity: (current[item.id]?.quantity ?? 0) + 1 } })); }} />
 
       {filtered.length === 0 ? (
         <p className="rounded-[20px] border border-[var(--border-soft)] bg-[var(--surface)] p-6 text-center text-sm text-[var(--text-secondary)]">
@@ -85,7 +90,7 @@ export function MenuBrowser({ categories, tableToken, tableLabel }: { categories
               <h2 className="mb-4 border-l-4 border-[var(--primary-green)] pl-3 text-xl font-bold tracking-tight text-[var(--text-primary)]">{category.name}</h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {category.menu_items.filter((item) => item.is_available).map((item) => (
-                  <FoodCard key={item.id} name={item.name} description={item.description} price={item.price} image={item.image} popular={item.is_signature === true} onSelect={() => setSelectedItem(item)} onAdd={() => setCart((current) => ({ ...current, [item.id]: { item, quantity: (current[item.id]?.quantity ?? 0) + 1 } }))} />
+                  <FoodCard key={item.id} name={item.name} description={item.description} price={item.price} image={item.image} popular={popularIds.includes(item.id)} badgeLabel="Popular" onSelect={() => setSelectedItem(item)} onAdd={() => setCart((current) => ({ ...current, [item.id]: { item, quantity: (current[item.id]?.quantity ?? 0) + 1 } }))} />
                 ))}
               </div>
             </section>
@@ -95,7 +100,7 @@ export function MenuBrowser({ categories, tableToken, tableLabel }: { categories
       {cartCount > 0 && (
         <aside className="sticky bottom-4 z-10 mt-8 flex items-center justify-between gap-4 rounded-[20px] bg-[var(--brown-dark)] p-4 text-white shadow-[var(--shadow-soft)]" aria-label="Ringkasan cart">
           <div>
-            <p className="text-xs text-white">{cartCount} {t("itemsInCart")}</p>
+            <p className="text-xs text-white">{tableToken ? `${t("tableDetected")}: ${tableToken}` : t("notDetected")}</p><p className="text-xs text-white">{cartCount} {t("itemsInCart")}</p>
             <p className="text-lg font-bold">RM {cartTotal.toFixed(2)}</p>
           </div>
           <button type="button" onClick={() => setCartOpen(true)} className="min-h-11 rounded-full bg-[var(--primary-green)] px-5 text-sm font-bold text-white hover:bg-[var(--primary-green-hover)]">
@@ -113,7 +118,7 @@ export function MenuBrowser({ categories, tableToken, tableLabel }: { categories
             <div className="mt-6 max-h-[45vh] space-y-3 overflow-y-auto">
               {cartItems.map(({ item, quantity }) => (
                 <div key={item.id} className="rounded-[var(--radius-md)] border border-[var(--soft-sand)] bg-white p-4">
-                  <div className="flex items-start justify-between gap-3"><div><h3 className="font-semibold text-[var(--charcoal)]">{item.name}</h3><p className="mt-1 text-sm text-[var(--secondary-text)]">RM {Number(item.price).toFixed(2)} {t("each")}</p></div><button type="button" onClick={() => setCart((current) => { const next = { ...current }; delete next[item.id]; return next; })} className="text-xs font-semibold text-[var(--sarawak-red)]">{t("remove")}</button></div>
+                  <div className="flex items-start justify-between gap-3"><div><h3 className="font-semibold text-[var(--charcoal)]">{item.name}</h3><div className="mt-1 flex flex-wrap items-center gap-2"><p className="text-sm text-[var(--secondary-text)]">RM {Number(item.price).toFixed(2)} {t("each")}</p>{recommendedIds.has(item.id) && <span className="rounded-full bg-[var(--gold-accent)] px-2 py-0.5 text-xs font-bold text-[var(--brown-dark)]">Recommended</span>}</div></div><button type="button" onClick={() => setCart((current) => { const next = { ...current }; delete next[item.id]; return next; })} className="min-h-11 px-2 text-xs font-semibold text-[var(--sarawak-red)]">{t("remove")}</button></div>
                   <div className="mt-3 flex items-center justify-between"><QuantitySelector label={item.name} quantity={quantity} onDecrease={() => setCart((current) => ({ ...current, [item.id]: { item, quantity: quantity > 1 ? quantity - 1 : 1 } }))} onIncrease={() => setCart((current) => ({ ...current, [item.id]: { item, quantity: quantity + 1 } }))} /><span className="font-bold text-[var(--charcoal)]">RM {(Number(item.price) * quantity).toFixed(2)}</span></div>
                 </div>
               ))}
@@ -128,7 +133,7 @@ export function MenuBrowser({ categories, tableToken, tableLabel }: { categories
             <div className="flex items-center justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--sarawak-red)]">{t("lastStep")}</p><h2 className="mt-1 text-2xl font-bold text-[var(--charcoal)]">{t("checkout")}</h2></div><button type="button" onClick={() => setCheckoutOpen(false)} className="min-h-11 min-w-11 rounded-full bg-white text-xl" aria-label={`${t("close")} ${t("checkout")}`}>×</button></div>
             <form className="mt-6 space-y-4" onSubmit={async (event) => { event.preventDefault(); if (isSubmitting) return; setCheckoutError(null); if (!tableToken) { setCheckoutError(t("qrIncomplete")); return; } const { data: { user } } = await createClient().auth.getUser(); if (!user && !guestCheckoutAllowed && !authChoiceOpen) { setAuthChoiceOpen(true); return; } setIsSubmitting(true); try { const response = await fetch("/api/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tableToken, specialNote, paymentMethod, items: cartItems.map(({ item, quantity }) => ({ menuItemId: item.id, quantity })) }) }); const result = await response.json(); if (!response.ok) { setCheckoutError(result.error ?? t("orderFailed")); return; } setSubmittedOrder(result.order); setCheckoutOpen(false); setCart({}); } catch { setCheckoutError(t("connectionFailed")); } finally { setIsSubmitting(false); } }}>
               <div className="rounded-[var(--radius-md)] border border-[var(--soft-sand)] bg-white px-4 py-3 text-sm text-[var(--secondary-text)]">
-                {t("tableDetected")}: <strong className="text-[var(--charcoal)]">{tableLabel || tableToken || t("notDetected")}</strong>
+                {t("tableDetected")}: <strong className="text-[var(--charcoal)]">{tableToken || t("notDetected")}</strong>
               </div>
               <label className="block text-sm font-semibold text-[var(--charcoal)]">{t("specialNote")} <span className="font-normal text-[var(--secondary-text)]">({t("optional")})</span><textarea value={specialNote} onChange={(event) => setSpecialNote(event.target.value)} maxLength={280} rows={3} placeholder={t("notePlaceholder")} className="mt-2 w-full rounded-[var(--radius-md)] border border-[var(--soft-sand)] bg-white p-4 text-sm text-[var(--charcoal)] placeholder:text-[var(--secondary-text)]" /></label>
               <fieldset><legend className="text-sm font-semibold text-[var(--charcoal)]">{t("paymentMethod")}</legend><div className="mt-2 grid grid-cols-2 gap-3">{(["cash", "card"] as const).map((method) => <label key={method} className={`flex min-h-12 cursor-pointer items-center justify-center rounded-full border text-sm font-semibold ${paymentMethod === method ? "border-[var(--sarawak-red)] bg-[var(--sarawak-red)] text-white" : "border-[var(--soft-sand)] bg-white text-[var(--charcoal)]"}`}><input type="radio" name="paymentMethod" value={method} checked={paymentMethod === method} onChange={() => setPaymentMethod(method)} className="sr-only" />{method === "cash" ? t("cash") : t("card")}</label>)}</div></fieldset>
