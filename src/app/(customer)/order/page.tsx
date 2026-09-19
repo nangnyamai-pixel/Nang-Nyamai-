@@ -11,27 +11,35 @@ export default async function OrderPage({ searchParams }: { searchParams: Search
   const table = typeof params.table === "string" ? params.table : "";
   const token = typeof params.token === "string" ? params.token : "";
   const previewCategories = menuData.categories.map((category) => ({
-    id: category.slug,
-    name: category.name,
-    menu_items: category.items.map((item, itemIndex) => ({
+      id: category.slug,
+      name: category.name,
+      menu_items: category.items.map((item, itemIndex) => ({
       id: `${category.slug}-${itemIndex + 1}`,
       name: item.name,
       description: "description" in item ? item.description ?? null : null,
       price: item.price,
       is_available: true,
       image: getMenuImage(category.slug, item.name),
-      is_signature: "is_signature" in item ? item.is_signature === true : false,
+        is_signature: "is_signature" in item ? item.is_signature === true : false,
+        categoryName: category.name,
     })),
   }));
   const hasSupabase = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY));
   let categories = hasSupabase ? [] : previewCategories;
+  let popularIds: string[] = previewCategories.flatMap((category) => category.menu_items.filter((item) => item.is_signature).map((item) => item.id));
 
   if (hasSupabase) {
     const supabase = await createClient();
-    const [{ data: liveCategories }, { data: liveItems }] = await Promise.all([
+    const [{ data: liveCategories }, { data: liveItems }, { data: popularityRows }] = await Promise.all([
       supabase.from("categories").select("id, name, slug, display_order").eq("is_active", true).order("display_order"),
       supabase.from("menu_items").select("id, category_id, name, description, price, image_url, is_available, is_popular").order("name"),
+      supabase.from("order_items").select("menu_item_id, quantity, orders!inner(status, payment_status)").eq("orders.status", "completed").eq("orders.payment_status", "paid"),
     ]);
+    const totals = new Map<string, number>();
+    for (const row of (popularityRows ?? []) as { menu_item_id: string; quantity: number }[]) totals.set(row.menu_item_id, (totals.get(row.menu_item_id) ?? 0) + Number(row.quantity || 0));
+    popularIds = totals.size > 0
+      ? [...totals.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 5).map(([id]) => id)
+      : (liveItems ?? []).filter((item) => item.is_available && item.is_popular).map((item) => item.id);
     if (liveCategories && liveItems) {
       categories = liveCategories.map((category) => ({
         id: category.id,
@@ -44,6 +52,7 @@ export default async function OrderPage({ searchParams }: { searchParams: Search
           is_available: item.is_available,
           image: item.image_url || getMenuImage(category.slug, item.name),
           is_signature: item.is_popular === true,
+          categoryName: category.name,
         })),
       })).filter((category) => category.menu_items.length > 0);
     }
@@ -56,7 +65,7 @@ export default async function OrderPage({ searchParams }: { searchParams: Search
         <p className="mt-2 text-sm text-[var(--secondary-text)]">{table ? `Table ${table}` : "Preview menu"} · Prices subject to 6% SST</p>
       </header>
       <section className="mx-auto max-w-5xl px-5 pb-12 sm:px-8">
-        <MenuBrowser categories={categories} tableToken={token || table} tableLabel={table || token} />
+        <MenuBrowser categories={categories} tableToken={token || table} popularIds={popularIds} />
       </section>
     </main>
   );

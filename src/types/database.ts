@@ -301,6 +301,32 @@ export interface Database {
           }
         ];
       };
+      ai_food_matches: {
+        Row: {
+          id: string;
+          customer_id: string | null;
+          session_id: string | null;
+          preferences: unknown;
+          top_match_food_id: string | null;
+          match_percentage: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          customer_id?: string | null;
+          session_id?: string | null;
+          preferences: unknown;
+          top_match_food_id?: string | null;
+          match_percentage: number;
+          created_at?: string;
+        };
+        Update: {
+          preferences?: unknown;
+          top_match_food_id?: string | null;
+          match_percentage?: number;
+        };
+        Relationships: [];
+      };
       feedback: {
         Row: {
           id: string;
