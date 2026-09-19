@@ -30,13 +30,14 @@ export default async function OrderPage({ searchParams }: { searchParams: Search
 
   if (hasSupabase) {
     const supabase = await createClient();
-    const [{ data: liveCategories }, { data: liveItems }, { data: popularityRows }] = await Promise.all([
+    const [{ data: liveCategories }, { data: liveItems }, { data: popularityRows, error: popularityError }] = await Promise.all([
       supabase.from("categories").select("id, name, slug, display_order").eq("is_active", true).order("display_order"),
       supabase.from("menu_items").select("id, category_id, name, description, price, image_url, is_available, is_popular").order("name"),
-      supabase.from("order_items").select("menu_item_id, quantity, orders!inner(status, payment_status)").eq("orders.status", "completed").eq("orders.payment_status", "paid"),
+      supabase.rpc("get_popular_menu_item_ids"),
     ]);
     const totals = new Map<string, number>();
-    for (const row of (popularityRows ?? []) as { menu_item_id: string; quantity: number }[]) totals.set(row.menu_item_id, (totals.get(row.menu_item_id) ?? 0) + Number(row.quantity || 0));
+    if (popularityError) console.error(`[MENU] popular items query failed code=${popularityError.code ?? "null"}`);
+    for (const row of (popularityRows ?? []) as { menu_item_id: string }[]) totals.set(row.menu_item_id, 1);
     popularIds = totals.size > 0
       ? [...totals.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 5).map(([id]) => id)
       : (liveItems ?? []).filter((item) => item.is_available && item.is_popular).map((item) => item.id);

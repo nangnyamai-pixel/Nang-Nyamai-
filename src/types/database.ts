@@ -374,6 +374,10 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      get_popular_menu_item_ids: {
+        Args: Record<string, never>;
+        Returns: { menu_item_id: string }[];
+      };
       get_receipt_customer_profile: {
         Args: { p_order_id: string };
         Returns: { full_name: string | null; phone: string | null; member_id: string | null }[];
